@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Calculadora</title>
+</head>
+<body>
+<h1>Calculadora de matrices</h1>
+<main>
+    <section id="matrizControles">
+        <div class="matriz-inputs">
+            <label for="filas">Filas:</label>
+            <input type="number" id="filas" placeholder="ingresar el valor entre 2 y 10">
+            <label for="columnas">Columnas:</label>
+            <input type="number" id="columnas" placeholder="ingresar el valor entre 2 y 10">
+        </div>
+        <button id="crearMatriz">Crear Matriz</button>
+        <button id="limpiarMatriz">Limpiar Matriz</button>
+    </section>
+    <section id="matrizInputs">
+        <div class="matriz" id="matrizA">
+            <h2>Matriz A</h2>
+            <table></table>
+        </div>
+        <div class="matriz" id="matrizB">
+            <h2>Matriz B</h2>
+            <table></table>
+        </div>
+    </section>
+    <section id="acciones">
+        <button id="sumar">Sumar</button>
+        <button id="restar">Restar</button>
+        <button id="multiplicar">Multiplicar</button>
+        <button id="transponer">Transponer</button>
+        <button id="determinante">Determinante</button>
+        <button id="inversa">Inversa</button>
+    </section>
+    <section id="resultados">
+        <div class="resultado" id="resultadoSuma">
+            <h2>Resultado Suma</h2>
+            <table></table>
+        </div>
+        <div class="resultado" id="resultadoResta">
+            <h2>Resultado Resta</h2>
+            <table></table>
+        </div>
+        <div class="resultado" id="resultadoMultiplicacion">
+            <h2>Resultado Multiplicación</h2>
+            <table></table>
+        </div>
+        <div class="resultado" id="resultadoTranspuesta">
+            <h2>Resultado Transpuesta</h2>
+            <table></table>
+        </div>
+        <div class="resultado" id="resultadoDeterminante">
+            <h2>Resultado Determinante</h2>
+            <p></p>
+        </div>
+        <div class="resultado" id="resultadoInversa">
+            <h2>Resultado Inversa</h2>
+            <table></table>
+        </div>
+    </section>
+</main>
+
+    <script src="script.js"></script>
+</body>
+</html>
