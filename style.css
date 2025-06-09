@@ -1,0 +1,266 @@
+body {
+    background: #14101a;
+    color: #e0d6f6;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #6d28a7;
+    margin-top: 30px;
+    letter-spacing: 2px;
+}
+
+main {
+    max-width: 950px;
+    margin: 30px auto 0 auto;
+    background: #1a1422;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px #000a;
+    padding: 32px 32px 24px 32px;
+}
+
+#matrizControles {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+#matrizControles label {
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+#matrizControles input[type="number"] {
+    width: 80px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1.5px solid #6d28a7;
+    background: #231b2e;
+    color: #e0d6f6;
+    margin-right: 8px;
+    font-size: 1em;
+}
+
+#matrizControles button {
+    background: linear-gradient(90deg, #3b186a 0%, #6d28a7 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    margin: 0 4px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px #0006;
+}
+#matrizControles button:hover {
+    background: linear-gradient(90deg, #6d28a7 0%, #3b186a 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+#acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 30px 0 20px 0;
+}
+
+#acciones button {
+    background: linear-gradient(90deg, #3b186a 0%, #6d28a7 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px #0006;
+}
+#acciones button:hover {
+    background: linear-gradient(90deg, #6d28a7 0%, #3b186a 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+#acciones span {
+    display: inline-flex;
+    align-items: center;
+    background: #231b2e;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-left: 10px;
+}
+
+#acciones input[type="number"], #acciones select {
+    background: #1a1422;
+    color: #e0d6f6;
+    border: 1.5px solid #6d28a7;
+    border-radius: 5px;
+    padding: 5px 8px;
+    margin-left: 5px;
+    font-size: 1em;
+}
+
+#acciones button[type="button"] {
+    background: #6d28a7;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    margin-left: 5px;
+    padding: 6px 12px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#acciones button[type="button"]:hover {
+    background: #3b186a;
+}
+
+#matrizInputs {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.matriz {
+    background: #231b2e;
+    border-radius: 12px;
+    padding: 18px 24px 18px 24px;
+    box-shadow: 0 2px 12px #0005;
+    min-width: 180px;
+}
+
+.matriz h2 {
+    text-align: center;
+    color: #6d28a7;
+    margin-bottom: 12px;
+    font-size: 1.2em;
+    letter-spacing: 1px;
+}
+
+.matriz table {
+    margin: 0 auto;
+}
+
+.matriz-input {
+    width: 48px;
+    height: 36px;
+    text-align: center;
+    font-size: 1.1em;
+    border-radius: 6px;
+    border: 1.5px solid #6d28a7;
+    background: #14101a;
+    color: #fff;
+    margin: 2px;
+    outline: none;
+    transition: border 0.2s;
+}
+.matriz-input.activa, .matriz-input:focus {
+    border: 2.5px solid #6d28a7;
+    background: #2a1c3f;
+}
+
+#tecladoNumerico {
+    margin: 18px auto 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 200px;
+    gap: 8px;
+    justify-content: center;
+}
+
+#tecladoNumerico button {
+    width: 44px;
+    height: 44px;
+    background: #6d28a7;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2em;
+    margin: 2px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 2px 8px #0004;
+}
+#tecladoNumerico button:hover {
+    background: #3b186a;
+    transform: scale(1.07);
+}
+
+#resultados {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+}
+
+.resultado {
+    background: #231b2e;
+    border-radius: 12px;
+    padding: 18px 24px 18px 24px;
+    box-shadow: 0 2px 12px #0005;
+    min-width: 220px;
+    margin-bottom: 20px;
+}
+
+.resultado h2 {
+    color: #6d28a7;
+    text-align: center;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.resultado table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    background: #14101a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.resultado table td, .resultado table th {
+    border: 1px solid #6d28a7;
+    padding: 8px 14px;
+    font-size: 1.1em;
+    color: #fff;
+    text-align: center;
+}
+
+.resultado table caption {
+    color: #6d28a7;
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 6px;
+    background: transparent;
+}
+
+.resultado .error {
+    color: #ff4f8b;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    main {
+        padding: 10px 2vw 10px 2vw;
+    }
+    #matrizInputs, #resultados {
+        flex-direction: column;
+        gap: 18px;
+        align-items: center;
+    }
+    .matriz, .resultado {
+        min-width: 0;
+        width: 95vw;
+        max-width: 420px;
+    }
+}

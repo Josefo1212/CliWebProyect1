@@ -184,26 +184,36 @@ function mostrarBotonGuardar(matriz) {
     }
 }
 
-function matrizCompleta(matriz) {
-    try {
-        for (let i = 0; i < nGlobal; i++) {
-            for (let j = 0; j < nGlobal; j++) {
-                const input = document.getElementById(`matriz${matriz}_${i}_${j}`);
-                if (
-                    !input ||
-                    input.value === '' ||
-                    isNaN(Number(input.value)) ||
-                    !/^[-+]?\d*\.?\d+$/.test(input.value)
-                ) {
-                    return false;
-                }
-            }
+// Utilidad para obtener matriz desde inputs
+function obtenerMatriz(id, n) {
+    const matriz = [];
+    for (let i = 0; i < n; i++) {
+        const fila = [];
+        for (let j = 0; j < n; j++) {
+            const val = parseFloat(document.getElementById(`${id}_${i}_${j}`).value);
+            if (isNaN(val)) return null;
+            fila.push(val);
         }
-        return true;
-    } catch (error) {
-        alert('Error al validar la matriz: ' + error.message);
-        return false;
+        matriz.push(fila);
     }
+    return matriz;
+}
+
+// Validación de matrices completas
+function matricesCompletas(ids, n) {
+    return ids.every(id => {
+        for (let i = 0; i < n; i++)
+            for (let j = 0; j < n; j++)
+                if (
+                    !document.getElementById(`${id}_${i}_${j}`) ||
+                    isNaN(Number(document.getElementById(`${id}_${i}_${j}`).value))
+                ) return false;
+        return true;
+    });
+}
+
+function matrizCompleta(matriz) {
+    return matricesCompletas([`matriz${matriz}`], nGlobal);
 }
 
 // Inicialmente ocultar Matriz B
@@ -220,8 +230,14 @@ let celdaActiva = null;
 // Al final del archivo, agrega este listener global:
 document.addEventListener('keydown', (e) => {
     try {
-        // No interceptar teclas si el foco está en el input del escalar
-        if (document.activeElement && document.activeElement.id === 'escalarInput') return;
+        // No interceptar teclas si el foco está en el input del escalar o el input de tamaño de identidad
+        if (
+            document.activeElement &&
+            (
+                document.activeElement.id === 'escalarInput' ||
+                document.activeElement.id === 'identidadSizeInput'
+            )
+        ) return;
         if (!celdaActiva) return;
         // Permitir ingresar números, el signo menos y el punto decimal
         if (
@@ -337,45 +353,18 @@ function limpiarMatriz(idMatriz) {
 // Suma de matrices (A + B)
 function sumarMatrices() {
     try {
-        // Validar dimensiones
-        const nA = document.querySelectorAll('#matrizA input').length;
-        const nB = document.querySelectorAll('#matrizB input').length;
-        if (nA === 0 || nB === 0) {
-            mostrarError('resultadoSuma', 'Debe ingresar ambas matrices.');
-            return;
-        }
         const n = nGlobal;
-        if (nA !== nB) {
-            mostrarError('resultadoSuma', 'Las dimensiones de las matrices no coinciden.');
+        if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
+            mostrarError('resultadoSuma', 'Debe ingresar ambas matrices completas.');
             return;
         }
-        // Obtener valores de ambas matrices
-        const matrizA = [];
-        const matrizB = [];
-        for (let i = 0; i < n; i++) {
-            const filaA = [];
-            const filaB = [];
-            for (let j = 0; j < n; j++) {
-                const valA = parseFloat(document.getElementById(`matrizA_${i}_${j}`).value);
-                const valB = parseFloat(document.getElementById(`matrizB_${i}_${j}`).value);
-                if (isNaN(valA) || isNaN(valB)) {
-                    mostrarError('resultadoSuma', 'Todas las celdas deben estar completas y ser números.');
-                    return;
-                }
-                filaA.push(valA);
-                filaB.push(valB);
-            }
-            matrizA.push(filaA);
-            matrizB.push(filaB);
+        const matrizA = obtenerMatriz('matrizA', n);
+        const matrizB = obtenerMatriz('matrizB', n);
+        if (!matrizA || !matrizB) {
+            mostrarError('resultadoSuma', 'Todas las celdas deben estar completas y ser números.');
+            return;
         }
-        // Sumar matrices
-        const resultado = [];
-        for (let i = 0; i < n; i++) {
-            resultado[i] = [];
-            for (let j = 0; j < n; j++) {
-                resultado[i][j] = matrizA[i][j] + matrizB[i][j];
-            }
-        }
+        const resultado = matrizA.map((fila, i) => fila.map((v, j) => v + matrizB[i][j]));
         mostrarResultadoSuma(resultado);
     } catch (error) {
         mostrarError('resultadoSuma', 'Error al sumar matrices: ' + error.message);
@@ -420,47 +409,19 @@ document.getElementById('sumar').addEventListener('click', sumarMatrices);
 // Resta de matrices (A - B y B - A)
 function restarMatrices() {
     try {
-        const nA = document.querySelectorAll('#matrizA input').length;
-        const nB = document.querySelectorAll('#matrizB input').length;
-        if (nA === 0 || nB === 0) {
-            mostrarError('resultadoResta', 'Debe ingresar ambas matrices.');
-            return;
-        }
         const n = nGlobal;
-        if (nA !== nB) {
-            mostrarError('resultadoResta', 'Las dimensiones de las matrices no coinciden.');
+        if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
+            mostrarError('resultadoResta', 'Debe ingresar ambas matrices completas.');
             return;
         }
-        // Obtener valores de ambas matrices
-        const matrizA = [];
-        const matrizB = [];
-        for (let i = 0; i < n; i++) {
-            const filaA = [];
-            const filaB = [];
-            for (let j = 0; j < n; j++) {
-                const valA = parseFloat(document.getElementById(`matrizA_${i}_${j}`).value);
-                const valB = parseFloat(document.getElementById(`matrizB_${i}_${j}`).value);
-                if (isNaN(valA) || isNaN(valB)) {
-                    mostrarError('resultadoResta', 'Todas las celdas deben estar completas y ser números.');
-                    return;
-                }
-                filaA.push(valA);
-                filaB.push(valB);
-            }
-            matrizA.push(filaA);
-            matrizB.push(filaB);
+        const matrizA = obtenerMatriz('matrizA', n);
+        const matrizB = obtenerMatriz('matrizB', n);
+        if (!matrizA || !matrizB) {
+            mostrarError('resultadoResta', 'Todas las celdas deben estar completas y ser números.');
+            return;
         }
-        // Calcular A - B y B - A
-        const resultadoAB = [];
-        const resultadoBA = [];
-        for (let i = 0; i < n; i++) {
-            resultadoAB[i] = [];
-            resultadoBA[i] = [];
-            for (let j = 0; j < n; j++) {
-                resultadoAB[i][j] = matrizA[i][j] - matrizB[i][j];
-                resultadoBA[i][j] = matrizB[i][j] - matrizA[i][j];
-            }
-        }
+        const resultadoAB = matrizA.map((fila, i) => fila.map((v, j) => v - matrizB[i][j]));
+        const resultadoBA = matrizB.map((fila, i) => fila.map((v, j) => v - matrizA[i][j]));
         mostrarResultadoResta(resultadoAB, resultadoBA);
     } catch (error) {
         mostrarError('resultadoResta', 'Error al restar matrices: ' + error.message);
@@ -518,48 +479,22 @@ document.getElementById('restar').addEventListener('click', restarMatrices);
 // Multiplicación de matrices (A × B)
 function multiplicarMatrices() {
     try {
-        const nA = document.querySelectorAll('#matrizA input').length;
-        const nB = document.querySelectorAll('#matrizB input').length;
-        if (nA === 0 || nB === 0) {
-            mostrarError('resultadoMultiplicacion', 'Debe ingresar ambas matrices.');
-            return;
-        }
         const n = nGlobal;
-        if (nA !== nB) {
-            mostrarError('resultadoMultiplicacion', 'Las dimensiones de las matrices no coinciden.');
+        if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
+            mostrarError('resultadoMultiplicacion', 'Debe ingresar ambas matrices completas.');
             return;
         }
-        // Obtener valores de ambas matrices
-        const matrizA = [];
-        const matrizB = [];
-        for (let i = 0; i < n; i++) {
-            const filaA = [];
-            const filaB = [];
-            for (let j = 0; j < n; j++) {
-                const valA = parseFloat(document.getElementById(`matrizA_${i}_${j}`).value);
-                const valB = parseFloat(document.getElementById(`matrizB_${i}_${j}`).value);
-                if (isNaN(valA) || isNaN(valB)) {
-                    mostrarError('resultadoMultiplicacion', 'Todas las celdas deben estar completas y ser números.');
-                    return;
-                }
-                filaA.push(valA);
-                filaB.push(valB);
-            }
-            matrizA.push(filaA);
-            matrizB.push(filaB);
+        const matrizA = obtenerMatriz('matrizA', n);
+        const matrizB = obtenerMatriz('matrizB', n);
+        if (!matrizA || !matrizB) {
+            mostrarError('resultadoMultiplicacion', 'Todas las celdas deben estar completas y ser números.');
+            return;
         }
-        // Multiplicar matrices (A × B)
-        const resultado = [];
-        for (let i = 0; i < n; i++) {
-            resultado[i] = [];
-            for (let j = 0; j < n; j++) {
-                let suma = 0;
-                for (let k = 0; k < n; k++) {
-                    suma += matrizA[i][k] * matrizB[k][j];
-                }
-                resultado[i][j] = suma;
-            }
-        }
+        const resultado = Array.from({ length: n }, (_, i) =>
+            Array.from({ length: n }, (_, j) =>
+                matrizA[i].reduce((sum, _, k) => sum + matrizA[i][k] * matrizB[k][j], 0)
+            )
+        );
         mostrarResultadoMultiplicacion(resultado);
     } catch (error) {
         mostrarError('resultadoMultiplicacion', 'Error al multiplicar matrices: ' + error.message);
@@ -645,45 +580,19 @@ function mostrarEscalarUI() {
 
 function multiplicarPorEscalar() {
     try {
-        const kInput = document.getElementById('escalarInput');
-        const select = document.getElementById('escalarMatrizSelect');
-        if (!kInput || !select) {
-            mostrarError('resultadoEscalar', 'No se encontró el campo para el escalar o la matriz.');
-            return;
-        }
-        const matriz = select.value;
-        const k = parseFloat(kInput.value);
-        if (isNaN(k)) {
-            mostrarError('resultadoEscalar', 'Ingrese un número válido para el escalar.');
-            return;
-        }
-        const nInputs = document.querySelectorAll(`#matriz${matriz} input`).length;
-        if (nInputs === 0) {
-            mostrarError('resultadoEscalar', `Debe ingresar la matriz ${matriz}.`);
-            return;
-        }
+        const k = parseFloat(document.getElementById('escalarInput').value);
+        const matriz = document.getElementById('escalarMatrizSelect').value;
         const n = nGlobal;
-        const matrizData = [];
-        for (let i = 0; i < n; i++) {
-            const fila = [];
-            for (let j = 0; j < n; j++) {
-                const val = parseFloat(document.getElementById(`matriz${matriz}_${i}_${j}`).value);
-                if (isNaN(val)) {
-                    mostrarError('resultadoEscalar', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
-                    return;
-                }
-                fila.push(val);
-            }
-            matrizData.push(fila);
+        if (isNaN(k) || !matricesCompletas([`matriz${matriz}`], n)) {
+            mostrarError('resultadoEscalar', 'Ingrese un escalar y matriz válidos.');
+            return;
         }
-        // Multiplicar por escalar
-        const resultado = [];
-        for (let i = 0; i < n; i++) {
-            resultado[i] = [];
-            for (let j = 0; j < n; j++) {
-                resultado[i][j] = k * matrizData[i][j];
-            }
+        const matrizData = obtenerMatriz(`matriz${matriz}`, n);
+        if (!matrizData) {
+            mostrarError('resultadoEscalar', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
+            return;
         }
+        const resultado = matrizData.map(fila => fila.map(v => k * v));
         mostrarResultadoEscalar(resultado);
     } catch (error) {
         mostrarError('resultadoEscalar', 'Error al multiplicar por escalar: ' + error.message);
@@ -758,39 +667,18 @@ function mostrarTransponerUI() {
 
 function transponerMatriz() {
     try {
-        const select = document.getElementById('transponerMatrizSelect');
-        if (!select) {
-            mostrarError('resultadoTranspuesta', 'No se encontró el campo para seleccionar la matriz.');
-            return;
-        }
-        const matriz = select.value;
-        const nInputs = document.querySelectorAll(`#matriz${matriz} input`).length;
-        if (nInputs === 0) {
+        const matriz = document.getElementById('transponerMatrizSelect').value;
+        const n = nGlobal;
+        if (!matricesCompletas([`matriz${matriz}`], n)) {
             mostrarError('resultadoTranspuesta', `Debe ingresar la matriz ${matriz}.`);
             return;
         }
-        const n = nGlobal;
-        const matrizData = [];
-        for (let i = 0; i < n; i++) {
-            const fila = [];
-            for (let j = 0; j < n; j++) {
-                const val = parseFloat(document.getElementById(`matriz${matriz}_${i}_${j}`).value);
-                if (isNaN(val)) {
-                    mostrarError('resultadoTranspuesta', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
-                    return;
-                }
-                fila.push(val);
-            }
-            matrizData.push(fila);
+        const matrizData = obtenerMatriz(`matriz${matriz}`, n);
+        if (!matrizData) {
+            mostrarError('resultadoTranspuesta', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
+            return;
         }
-        // Calcular transpuesta
-        const transpuesta = [];
-        for (let i = 0; i < n; i++) {
-            transpuesta[i] = [];
-            for (let j = 0; j < n; j++) {
-                transpuesta[i][j] = matrizData[j][i];
-            }
-        }
+        const transpuesta = matrizData[0].map((_, j) => matrizData.map(fila => fila[j]));
         mostrarResultadoTranspuesta(matriz, matrizData, transpuesta);
     } catch (error) {
         mostrarError('resultadoTranspuesta', 'Error al transponer la matriz: ' + error.message);
@@ -885,34 +773,19 @@ function mostrarDeterminanteUI() {
 
 function calcularDeterminante() {
     try {
-        const select = document.getElementById('determinanteMatrizSelect');
-        if (!select) {
-            mostrarError('resultadoDeterminante', 'No se encontró el campo para seleccionar la matriz.');
-            return;
-        }
-        const matriz = select.value;
-        const nInputs = document.querySelectorAll(`#matriz${matriz} input`).length;
-        if (nInputs === 0) {
+        const matriz = document.getElementById('determinanteMatrizSelect').value;
+        const n = nGlobal;
+        if (!matricesCompletas([`matriz${matriz}`], n)) {
             mostrarError('resultadoDeterminante', `Debe ingresar la matriz ${matriz}.`);
             return;
         }
-        const n = nGlobal;
-        const matrizData = [];
-        for (let i = 0; i < n; i++) {
-            const fila = [];
-            for (let j = 0; j < n; j++) {
-                const val = parseFloat(document.getElementById(`matriz${matriz}_${i}_${j}`).value);
-                if (isNaN(val)) {
-                    mostrarError('resultadoDeterminante', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
-                    return;
-                }
-                fila.push(val);
-            }
-            matrizData.push(fila);
+        const matrizData = obtenerMatriz(`matriz${matriz}`, n);
+        if (!matrizData) {
+            mostrarError('resultadoDeterminante', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
+            return;
         }
-        // Calcular determinante usando eliminación gaussiana
         const det = determinanteGauss(matrizData);
-        mostrarResultadoDeterminante(det);
+        mostrarResultadoDeterminante(det, matriz);
     } catch (error) {
         mostrarError('resultadoDeterminante', 'Error al calcular el determinante: ' + error.message);
     }
@@ -954,9 +827,9 @@ function determinanteGauss(matriz) {
     return Math.round(det * 10000) / 10000;
 }
 
-function mostrarResultadoDeterminante(det) {
+function mostrarResultadoDeterminante(det, matriz) {
     const div = document.getElementById('resultadoDeterminante');
-    div.querySelector('p').textContent = `Determinante: ${det}`;
+    div.querySelector('p').textContent = `Determinante (${matriz}): ${det}`;
     // Limpiar mensaje de error si lo hubiera
     let error = div.querySelector('.error');
     if (error) error.remove();
@@ -1012,46 +885,29 @@ function mostrarInversaUI() {
 
 function calcularInversa() {
     try {
-        const select = document.getElementById('inversaMatrizSelect');
-        if (!select) {
-            mostrarError('resultadoInversa', 'No se encontró el campo para seleccionar la matriz.');
-            return;
-        }
-        const matriz = select.value;
-        const nInputs = document.querySelectorAll(`#matriz${matriz} input`).length;
-        if (nInputs === 0) {
+        const matriz = document.getElementById('inversaMatrizSelect').value;
+        const n = nGlobal;
+        if (!matricesCompletas([`matriz${matriz}`], n)) {
             mostrarError('resultadoInversa', `Debe ingresar la matriz ${matriz}.`);
             return;
         }
-        const n = nGlobal;
-        const matrizData = [];
-        for (let i = 0; i < n; i++) {
-            const fila = [];
-            for (let j = 0; j < n; j++) {
-                const val = parseFloat(document.getElementById(`matriz${matriz}_${i}_${j}`).value);
-                if (isNaN(val)) {
-                    mostrarError('resultadoInversa', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
-                    return;
-                }
-                fila.push(val);
-            }
-            matrizData.push(fila);
+        const matrizData = obtenerMatriz(`matriz${matriz}`, n);
+        if (!matrizData) {
+            mostrarError('resultadoInversa', `Todas las celdas de la matriz ${matriz} deben estar completas y ser números.`);
+            return;
         }
-        // Validar determinante
         const det = determinanteGauss(matrizData);
         if (Math.abs(det) < 1e-10) {
             mostrarError('resultadoInversa', 'La matriz no es invertible (determinante = 0).');
             mostrarResultadoInversa(null, null, null, matriz);
             return;
         }
-        // Calcular inversa
         const inversa = inversaGaussJordan(matrizData);
         if (!inversa) {
             mostrarError('resultadoInversa', 'La matriz no es invertible (singular o mal condicionada).');
             mostrarResultadoInversa(null, null, null, matriz);
             return;
         }
-        // Verificación: A × A^-1 = I
         const producto = multiplicarMatricesGenerico(matrizData, inversa);
         mostrarResultadoInversa(matrizData, inversa, producto, matriz);
     } catch (error) {
@@ -1277,5 +1133,8 @@ function mostrarResultadoIdentidad(identidad) {
     if (error) error.remove();
 }
 
-// Event listener para el botón "identidad"
+// Event listeners para los botones que faltan
+document.getElementById('transponer').addEventListener('click', mostrarTransponerUI);
+document.getElementById('inversa').addEventListener('click', mostrarInversaUI);
 document.getElementById('identidad').addEventListener('click', mostrarIdentidadUI);
+
