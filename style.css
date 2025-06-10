@@ -61,6 +61,12 @@ main {
     transform: translateY(-2px) scale(1.04);
 }
 
+#matrizControles #cargarEjemplo {
+    margin-top: 0;
+    margin-bottom: 0;
+    display: inline-block;
+}
+
 #acciones {
     display: flex;
     flex-wrap: wrap;
@@ -247,6 +253,30 @@ main {
     font-weight: bold;
     margin-top: 10px;
     text-align: center;
+}
+
+#guardarMatrizA,
+#guardarMatrizB {
+    background: linear-gradient(90deg, #2d1e5e 0%, #1e90ff 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 1.08em;
+    font-weight: 700;
+    cursor: pointer;
+    margin: 18px auto 0 auto;
+    display: block;
+    box-shadow: 0 3px 12px #0007;
+    letter-spacing: 1px;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    border-bottom: 3px solid #1e90ff;
+}
+#guardarMatrizA:hover,
+#guardarMatrizB:hover {
+    background: linear-gradient(90deg, #1e90ff 0%, #2d1e5e 100%);
+    box-shadow: 0 6px 18px #1e90ff55;
+    transform: translateY(-2px) scale(1.07);
 }
 
 @media (max-width: 900px) {

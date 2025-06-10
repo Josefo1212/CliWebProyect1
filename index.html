@@ -12,10 +12,13 @@
     <section id="matrizControles">
     <div>        
         <label for="size">Tamaño de la matriz (N x N):</label>
-        <input type="number" id="size" placeholder="Entre 2 y 10">
+        <input type="number" id="size" placeholder="Entre 2 y 10" min="2" max="10">
         <button id="crearMatriz">Crear Matriz</button>
         <button id="matrizAleatoria">Crear Matriz Aleatoria</button>
         <button id="limpiarMatriz">Limpiar Matriz</button>
+    </div>
+    <div style="margin-top:12px; text-align:center;">
+        <button id="cargarEjemplo">Cargar Ejemplo</button>
     </div>
     </section>
     <section id="matrizInputs">

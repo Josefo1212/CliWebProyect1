@@ -1,3 +1,5 @@
+/* Evento para crear la matriz A y preparar la interfaz para la entrada de datos.
+ Al presionar el botón "Crear Matriz", se genera la tabla de inputs para la matriz A y se oculta la matriz B hasta que la A esté completa.*/
 document.getElementById('crearMatriz').addEventListener('click', () => {
     try {
         const n = parseInt(document.getElementById('size').value, 10);
@@ -21,6 +23,8 @@ document.getElementById('crearMatriz').addEventListener('click', () => {
     }
 });
 
+/* Función para generar los inputs de una matriz cuadrada de tamaño n.
+ Cada celda es un input de solo lectura, editable solo mediante el teclado numérico personalizado.*/
 function generarInputsMatriz(idMatriz, n) {
     try {
         const tabla = document.querySelector(`#${idMatriz} table`);
@@ -45,6 +49,8 @@ function generarInputsMatriz(idMatriz, n) {
     }
 }
 
+/* Muestra el teclado numérico personalizado debajo de la matriz activa.
+ Permite ingresar números, decimales y signo negativo, además de avanzar o borrar.*/
 function mostrarTecladoNumerico() {
     try {
         // Si ya existe, elimínalo antes de crear uno nuevo (para limpiar el DOM)
@@ -98,6 +104,8 @@ function mostrarTecladoNumerico() {
     }
 }
 
+/* Marca una celda como activa para recibir la entrada del teclado numérico o del teclado físico.
+ Solo una celda puede estar activa a la vez.*/
 function seleccionarCelda(id) {
     try {
         if (celdaActiva) celdaActiva.classList.remove('activa');
@@ -108,6 +116,8 @@ function seleccionarCelda(id) {
     }
 }
 
+/* Avanza a la siguiente celda de la matriz tras validar el valor ingresado.
+ Si es la última celda, muestra el botón para guardar la matriz.*/
 function avanzarCelda() {
     try {
         if (!celdaActiva) return;
@@ -140,6 +150,8 @@ function avanzarCelda() {
     }
 }
 
+// Muestra el botón para guardar la matriz A o B una vez que todas las celdas están completas.
+// Al guardar la matriz A, se pasa a la matriz B; al guardar la B, se habilitan las operaciones.
 function mostrarBotonGuardar(matriz) {
     try {
         // Evita múltiples botones de guardar
@@ -184,7 +196,45 @@ function mostrarBotonGuardar(matriz) {
     }
 }
 
-// Utilidad para obtener matriz desde inputs
+// funcion para generar ejemplo
+document.getElementById('cargarEjemplo').addEventListener('click', () => {
+    try {
+        let n = parseInt(document.getElementById('size').value, 10);
+        if (isNaN(n) || n < 2 || n > 10) n = 3;
+        nGlobal = n;
+        matrizActual = 'A';
+        generarInputsMatriz('matrizA', n);
+        generarInputsMatriz('matrizB', n);
+        document.getElementById('matrizB').style.display = '';
+        const ejemploA = [];
+        const ejemploB = [];
+        for (let i = 0; i < n; i++) {
+            ejemploA[i] = [];
+            ejemploB[i] = [];
+            for (let j = 0; j < n; j++) {
+                ejemploA[i][j] = i * n + j + 1;
+                ejemploB[i][j] = n * n - (i * n + j);
+            }
+        }
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+                document.getElementById(`matrizA_${i}_${j}`).value = ejemploA[i][j];
+                document.getElementById(`matrizB_${i}_${j}`).value = ejemploB[i][j];
+            }
+        }
+        document.getElementById('guardarMatrizA')?.remove();
+        document.getElementById('guardarMatrizB')?.remove();
+        document.getElementById('tecladoNumerico')?.remove();
+        matrizActual = 'A';
+        celdaActiva = null;
+        document.getElementById('matrizA').style.display = '';
+        document.getElementById('matrizB').style.display = '';
+    } catch (error) {
+        alert('Error al cargar el ejemplo: ' + error.message);
+    }
+});
+
+// funcion para obtener la matriz del input
 function obtenerMatriz(id, n) {
     const matriz = [];
     for (let i = 0; i < n; i++) {
@@ -199,35 +249,40 @@ function obtenerMatriz(id, n) {
     return matriz;
 }
 
-// Validación de matrices completas
+// funcion para validar matrices y sus dimensiones
 function matricesCompletas(ids, n) {
-    return ids.every(id => {
+    for (let id of ids) {
         for (let i = 0; i < n; i++)
-            for (let j = 0; j < n; j++)
-                if (
-                    !document.getElementById(`${id}_${i}_${j}`) ||
-                    isNaN(Number(document.getElementById(`${id}_${i}_${j}`).value))
-                ) return false;
-        return true;
-    });
+            for (let j = 0; j < n; j++) {
+                const el = document.getElementById(`${id}_${i}_${j}`);
+                if (!el || !/^[-+]?\d*\.?\d+$/.test(el.value)) return false;
+            }
+    }
+    return true;
 }
 
+// Verifica que la matriz indicada esté completamente llena y con valores válidos.
 function matrizCompleta(matriz) {
     return matricesCompletas([`matriz${matriz}`], nGlobal);
 }
 
-// Inicialmente ocultar Matriz B
+// Oculta la matriz B al inicio para forzar el flujo de llenado primero de la matriz A
 try {
     document.getElementById('matrizB').style.display = 'none';
 } catch (error) {
     alert('Error al ocultar la Matriz B: ' + error.message);
 }
 
-let matrizActual = 'A'; // 'A' o 'B'
+// Variables globales para controlar el estado de la aplicación:
+// matrizActual: indica si se está trabajando con la matriz A o B.
+// nGlobal: tamaño actual de las matrices.
+// celdaActiva: referencia al input actualmente seleccionado.
+let matrizActual = 'A';
 let nGlobal = 0;
 let celdaActiva = null;
 
-// Al final del archivo, agrega este listener global:
+// Listener global para capturar entradas del teclado físico y dirigirlas a la celda activa.
+// Permite ingresar números, borrar y avanzar con Enter.
 document.addEventListener('keydown', (e) => {
     try {
         // No interceptar teclas si el foco está en el input del escalar o el input de tamaño de identidad
@@ -265,6 +320,8 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Permite llenar la matriz A o B con valores aleatorios entre -10 y 10.
+// Detecta automáticamente si se debe llenar la matriz A o B según el flujo actual.
 document.getElementById('matrizAleatoria').addEventListener('click', () => {
     try {
         const n = parseInt(document.getElementById('size').value, 10);
@@ -307,13 +364,14 @@ document.getElementById('matrizAleatoria').addEventListener('click', () => {
     }
 });
 
+// Rellena una matriz específica con valores aleatorios en el rango [-10, 10].
 function rellenarMatrizAleatoria(idMatriz, n) {
     try {
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < n; j++) {
                 const input = document.getElementById(`${idMatriz}_${i}_${j}`);
                 if (input) {
-                    input.value = Math.floor(Math.random() * 21) - 10; // Números enteros entre -10 y 10
+                    input.value = Math.floor(Math.random() * 21) - 10;
                 }
             }
         }
@@ -322,6 +380,8 @@ function rellenarMatrizAleatoria(idMatriz, n) {
     }
 }
 
+// Limpia ambas matrices y reinicia la interfaz para un nuevo ingreso.
+// También elimina botones y el teclado numérico.
 document.getElementById('limpiarMatriz').addEventListener('click', () => {
     try {
         limpiarMatriz('matrizA');
@@ -341,6 +401,7 @@ document.getElementById('limpiarMatriz').addEventListener('click', () => {
     }
 });
 
+// Limpia todos los inputs de una matriz específica.
 function limpiarMatriz(idMatriz) {
     try {
         const inputs = document.querySelectorAll(`#${idMatriz} input`);
@@ -354,14 +415,20 @@ function limpiarMatriz(idMatriz) {
 function sumarMatrices() {
     try {
         const n = nGlobal;
+        // Validar dimensiones iguales
         if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
-            mostrarError('resultadoSuma', 'Debe ingresar ambas matrices completas.');
+            mostrarError('resultadoSuma', 'Debe ingresar ambas matrices completas y del mismo tamaño.');
             return;
         }
         const matrizA = obtenerMatriz('matrizA', n);
         const matrizB = obtenerMatriz('matrizB', n);
         if (!matrizA || !matrizB) {
             mostrarError('resultadoSuma', 'Todas las celdas deben estar completas y ser números.');
+            return;
+        }
+        // Validar dimensiones iguales
+        if (matrizA.length !== matrizB.length || matrizA[0].length !== matrizB[0].length) {
+            mostrarError('resultadoSuma', 'Las matrices deben tener las mismas dimensiones.');
             return;
         }
         const resultado = matrizA.map((fila, i) => fila.map((v, j) => v + matrizB[i][j]));
@@ -371,6 +438,7 @@ function sumarMatrices() {
     }
 }
 
+// Muestra el resultado de la suma de matrices en una tabla.
 function mostrarResultadoSuma(resultado) {
     const tabla = document.querySelector('#resultadoSuma table');
     tabla.innerHTML = '';
@@ -389,6 +457,7 @@ function mostrarResultadoSuma(resultado) {
     if (error) error.remove();
 }
 
+// Muestra un mensaje de error en el div correspondiente y limpia la tabla de resultados.
 function mostrarError(idDiv, mensaje) {
     const div = document.getElementById(idDiv);
     let error = div.querySelector('.error');
@@ -411,13 +480,17 @@ function restarMatrices() {
     try {
         const n = nGlobal;
         if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
-            mostrarError('resultadoResta', 'Debe ingresar ambas matrices completas.');
+            mostrarError('resultadoResta', 'Debe ingresar ambas matrices completas y del mismo tamaño.');
             return;
         }
         const matrizA = obtenerMatriz('matrizA', n);
         const matrizB = obtenerMatriz('matrizB', n);
         if (!matrizA || !matrizB) {
             mostrarError('resultadoResta', 'Todas las celdas deben estar completas y ser números.');
+            return;
+        }
+        if (matrizA.length !== matrizB.length || matrizA[0].length !== matrizB[0].length) {
+            mostrarError('resultadoResta', 'Las matrices deben tener las mismas dimensiones.');
             return;
         }
         const resultadoAB = matrizA.map((fila, i) => fila.map((v, j) => v - matrizB[i][j]));
@@ -428,6 +501,7 @@ function restarMatrices() {
     }
 }
 
+// Muestra los resultados de la resta de matrices (A-B y B-A) en la interfaz.
 function mostrarResultadoResta(resultadoAB, resultadoBA) {
     const tabla = document.querySelector('#resultadoResta table');
     tabla.innerHTML = '';
@@ -490,6 +564,11 @@ function multiplicarMatrices() {
             mostrarError('resultadoMultiplicacion', 'Todas las celdas deben estar completas y ser números.');
             return;
         }
+        // Validar compatibilidad: columnas de A = filas de B
+        if (matrizA[0].length !== matrizB.length) {
+            mostrarError('resultadoMultiplicacion', 'El número de columnas de A debe ser igual al número de filas de B.');
+            return;
+        }
         const resultado = Array.from({ length: n }, (_, i) =>
             Array.from({ length: n }, (_, j) =>
                 matrizA[i].reduce((sum, _, k) => sum + matrizA[i][k] * matrizB[k][j], 0)
@@ -501,6 +580,7 @@ function multiplicarMatrices() {
     }
 }
 
+// Muestra el resultado de la multiplicación de matrices en una tabla.
 function mostrarResultadoMultiplicacion(resultado) {
     const tabla = document.querySelector('#resultadoMultiplicacion table');
     tabla.innerHTML = '';
@@ -522,7 +602,8 @@ function mostrarResultadoMultiplicacion(resultado) {
 // Event listener para el botón "multiplicar"
 document.getElementById('multiplicar').addEventListener('click', multiplicarMatrices);
 
-// Multiplicación por escalar (k × A o k × B)
+// Muestra el formulario para multiplicar una matriz por un escalar.
+// Permite seleccionar la matriz y el valor del escalar.
 function mostrarEscalarUI() {
     // Evita múltiples formularios
     if (document.getElementById('escalarForm')) return;
@@ -578,6 +659,7 @@ function mostrarEscalarUI() {
     acciones.appendChild(form);
 }
 
+// Multiplica la matriz seleccionada por el escalar ingresado y muestra el resultado.
 function multiplicarPorEscalar() {
     try {
         const k = parseFloat(document.getElementById('escalarInput').value);
@@ -599,6 +681,7 @@ function multiplicarPorEscalar() {
     }
 }
 
+// Muestra el resultado de la multiplicación por escalar en una tabla.
 function mostrarResultadoEscalar(resultado) {
     const tabla = document.querySelector('#resultadoEscalar table');
     tabla.innerHTML = '';
@@ -620,7 +703,7 @@ function mostrarResultadoEscalar(resultado) {
 // Event listener para el botón "escalar"
 document.getElementById('escalar').addEventListener('click', mostrarEscalarUI);
 
-// Transposición de matriz (A^T o B^T)
+// Muestra el formulario para seleccionar la matriz a transponer.
 function mostrarTransponerUI() {
     if (document.getElementById('transponerForm')) return;
 
@@ -665,6 +748,7 @@ function mostrarTransponerUI() {
     acciones.appendChild(form);
 }
 
+// Calcula la transpuesta de la matriz seleccionada y muestra el resultado junto a la original.
 function transponerMatriz() {
     try {
         const matriz = document.getElementById('transponerMatrizSelect').value;
@@ -685,6 +769,7 @@ function transponerMatriz() {
     }
 }
 
+// Muestra la matriz original y su transpuesta en la interfaz.
 function mostrarResultadoTranspuesta(matriz, original, transpuesta) {
     const div = document.getElementById('resultadoTranspuesta');
     div.innerHTML = `
@@ -726,7 +811,7 @@ function mostrarResultadoTranspuesta(matriz, original, transpuesta) {
     });
 }
 
-// Determinante de matriz (det(A) o det(B))
+// Muestra el formulario para seleccionar la matriz de la que se calculará el determinante.
 function mostrarDeterminanteUI() {
     if (document.getElementById('determinanteForm')) return;
 
@@ -771,6 +856,7 @@ function mostrarDeterminanteUI() {
     acciones.appendChild(form);
 }
 
+// Calcula el determinante de la matriz seleccionada usando eliminación gaussiana.
 function calcularDeterminante() {
     try {
         const matriz = document.getElementById('determinanteMatrizSelect').value;
@@ -827,9 +913,10 @@ function determinanteGauss(matriz) {
     return Math.round(det * 10000) / 10000;
 }
 
+// Muestra el resultado del determinante en la interfaz.
 function mostrarResultadoDeterminante(det, matriz) {
     const div = document.getElementById('resultadoDeterminante');
-    div.querySelector('p').textContent = `Determinante (${matriz}): ${det}`;
+    div.querySelector('p').textContent = `Determinante(${matriz}): ${det}`;
     // Limpiar mensaje de error si lo hubiera
     let error = div.querySelector('.error');
     if (error) error.remove();
@@ -838,7 +925,7 @@ function mostrarResultadoDeterminante(det, matriz) {
 // Event listener para el botón "determinante"
 document.getElementById('determinante').addEventListener('click', mostrarDeterminanteUI);
 
-// Inversa de matriz (A^-1 o B^-1)
+// Muestra el formulario para seleccionar la matriz a invertir.
 function mostrarInversaUI() {
     if (document.getElementById('inversaForm')) return;
 
@@ -883,6 +970,8 @@ function mostrarInversaUI() {
     acciones.appendChild(form);
 }
 
+// Calcula la inversa de la matriz seleccionada usando el método de Gauss-Jordan.
+// Si la matriz no es invertible, muestra un mensaje de error.
 function calcularInversa() {
     try {
         const matriz = document.getElementById('inversaMatrizSelect').value;
@@ -964,7 +1053,8 @@ function inversaGaussJordan(mat) {
     return I;
 }
 
-// Multiplicación genérica de matrices cuadradas
+// Multiplica dos matrices cuadradas de igual tamaño y retorna el resultado.
+// Utilizada para verificar la inversa (debe dar la identidad).
 function multiplicarMatricesGenerico(A, B) {
     const n = A.length;
     const resultado = [];
@@ -982,6 +1072,7 @@ function multiplicarMatricesGenerico(A, B) {
     return resultado;
 }
 
+// Muestra la matriz original, su inversa y la verificación (producto) en la interfaz.
 function mostrarResultadoInversa(original, inversa, producto, matriz) {
     const div = document.getElementById('resultadoInversa');
     if (!inversa) {
@@ -1089,6 +1180,7 @@ function mostrarIdentidadUI() {
     acciones.appendChild(form);
 }
 
+// Genera la matriz identidad de tamaño n y la muestra en la interfaz.
 function generarIdentidad() {
     try {
         const input = document.getElementById('identidadSizeInput');
@@ -1111,6 +1203,7 @@ function generarIdentidad() {
     }
 }
 
+// Muestra la matriz identidad generada en una tabla.
 function mostrarResultadoIdentidad(identidad) {
     const div = document.getElementById('resultadoIdentidad');
     div.innerHTML = `
@@ -1137,4 +1230,6 @@ function mostrarResultadoIdentidad(identidad) {
 document.getElementById('transponer').addEventListener('click', mostrarTransponerUI);
 document.getElementById('inversa').addEventListener('click', mostrarInversaUI);
 document.getElementById('identidad').addEventListener('click', mostrarIdentidadUI);
+
+// Fin del archivo. Todas las funciones y eventos están documentados para facilitar el mantenimiento y futuras mejoras.
 
