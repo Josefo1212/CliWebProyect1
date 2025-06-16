@@ -214,6 +214,8 @@ main {
     box-shadow: 0 2px 12px #0005;
     min-width: 220px;
     margin-bottom: 20px;
+    width: 100%;
+    max-width: 700px;
 }
 
 .resultado h2 {
@@ -238,14 +240,6 @@ main {
     font-size: 1.1em;
     color: #fff;
     text-align: center;
-}
-
-.resultado table caption {
-    color: #6d28a7;
-    font-weight: bold;
-    font-size: 1em;
-    margin-bottom: 6px;
-    background: transparent;
 }
 
 .resultado .error {
