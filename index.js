@@ -38,6 +38,8 @@ function generarInputsMatriz(idMatriz, n) {
             }
             tabla.appendChild(fila);
         }
+        // Agregar listeners después de crear los inputs
+        agregarListenersInputsMatriz(idMatriz, n);
     } catch (error) {
         alert('Error al generar la matriz: ' + error.message);
     }
@@ -103,28 +105,85 @@ function matricesCompletas(ids, n) {
 }
 
 // nGlobal: tamaño actual de las matrices.
-let nGlobal = 0;
-
 // Permite llenar la matriz A o B con valores aleatorios entre -10 y 10.
-// Detecta automáticamente si se debe llenar la matriz A o B según el flujo actual.
+// Ahora muestra un formulario para elegir cuál matriz rellenar.
 document.getElementById('matrizAleatoria').addEventListener('click', () => {
-    try {
-        const n = parseInt(document.getElementById('size').value, 10);
-        if (isNaN(n) || n < 2 || n > 10) {
-            alert('Por favor, ingrese un tamaño válido entre 2 y 10.');
-            return;
+    if (document.getElementById('aleatorioForm')) return;
+    const acciones = document.getElementById('acciones');
+    const form = document.createElement('span');
+    form.id = 'aleatorioForm';
+    form.style.marginLeft = '10px';
+
+    const label = document.createElement('label');
+    label.textContent = 'Rellenar: ';
+    label.style.marginRight = '5px';
+
+    const select = document.createElement('select');
+    select.id = 'aleatorioMatrizSelect';
+    const optionA = document.createElement('option');
+    optionA.value = 'A';
+    optionA.textContent = 'Matriz A';
+    const optionB = document.createElement('option');
+    optionB.value = 'B';
+    optionB.textContent = 'Matriz B';
+    const optionAmbas = document.createElement('option');
+    optionAmbas.value = 'Ambas';
+    optionAmbas.textContent = 'Ambas';
+    select.appendChild(optionA);
+    select.appendChild(optionB);
+    select.appendChild(optionAmbas);
+
+    const btn = document.createElement('button');
+    btn.textContent = 'OK';
+    btn.type = 'button';
+    btn.style.marginLeft = '5px';
+    btn.onclick = () => {
+        try {
+            const n = parseInt(document.getElementById('size').value, 10);
+            if (isNaN(n) || n < 2 || n > 10) {
+                alert('Por favor, ingrese un tamaño válido entre 2 y 10.');
+                form.remove();
+                return;
+            }
+            // Solo regenerar inputs si el tamaño cambió
+            if (n !== nGlobal) {
+                nGlobal = n;
+                generarInputsMatriz('matrizA', n);
+                generarInputsMatriz('matrizB', n);
+            } else {
+                nGlobal = n;
+            }
+            const seleccion = select.value;
+            if (seleccion === 'A') {
+                rellenarMatrizAleatoria('matrizA', n);
+                // No limpiar ni regenerar matrizB
+            } else if (seleccion === 'B') {
+                rellenarMatrizAleatoria('matrizB', n);
+                // No limpiar ni regenerar matrizA
+            } else {
+                rellenarMatrizAleatoria('matrizA', n);
+                rellenarMatrizAleatoria('matrizB', n);
+            }
+            document.getElementById('matrizA').style.display = '';
+            document.getElementById('matrizB').style.display = '';
+            limpiarResultado();
+        } catch (error) {
+            alert('Error al crear matriz aleatoria: ' + error.message);
         }
-        nGlobal = n;
-        generarInputsMatriz('matrizA', n);
-        generarInputsMatriz('matrizB', n);
-        rellenarMatrizAleatoria('matrizA', n);
-        rellenarMatrizAleatoria('matrizB', n);
-        document.getElementById('matrizA').style.display = '';
-        document.getElementById('matrizB').style.display = '';
-        limpiarResultado();
-    } catch (error) {
-        alert('Error al crear matriz aleatoria: ' + error.message);
-    }
+        form.remove();
+    };
+
+    const btnCancel = document.createElement('button');
+    btnCancel.textContent = 'Cancelar';
+    btnCancel.type = 'button';
+    btnCancel.style.marginLeft = '5px';
+    btnCancel.onclick = () => form.remove();
+
+    form.appendChild(label);
+    form.appendChild(select);
+    form.appendChild(btn);
+    form.appendChild(btnCancel);
+    acciones.appendChild(form);
 });
 
 // Rellena una matriz específica con valores aleatorios en el rango [-10, 10].
@@ -144,17 +203,68 @@ function rellenarMatrizAleatoria(idMatriz, n) {
 }
 
 // Limpia ambas matrices y reinicia la interfaz para un nuevo ingreso.
-// También elimina botones y el teclado numérico.
+// Ahora muestra un formulario para elegir cuál matriz limpiar.
 document.getElementById('limpiarMatriz').addEventListener('click', () => {
-    try {
-        limpiarMatriz('matrizA');
-        limpiarMatriz('matrizB');
-        document.getElementById('matrizA').style.display = '';
-        document.getElementById('matrizB').style.display = '';
-        limpiarResultado();
-    } catch (error) {
-        alert('Error al limpiar las matrices: ' + error.message);
-    }
+    if (document.getElementById('limpiarForm')) return;
+    const acciones = document.getElementById('acciones');
+    const form = document.createElement('span');
+    form.id = 'limpiarForm';
+    form.style.marginLeft = '10px';
+
+    const label = document.createElement('label');
+    label.textContent = 'Limpiar: ';
+    label.style.marginRight = '5px';
+
+    const select = document.createElement('select');
+    select.id = 'limpiarMatrizSelect';
+    const optionA = document.createElement('option');
+    optionA.value = 'A';
+    optionA.textContent = 'Matriz A';
+    const optionB = document.createElement('option');
+    optionB.value = 'B';
+    optionB.textContent = 'Matriz B';
+    const optionAmbas = document.createElement('option');
+    optionAmbas.value = 'Ambas';
+    optionAmbas.textContent = 'Ambas';
+    select.appendChild(optionA);
+    select.appendChild(optionB);
+    select.appendChild(optionAmbas);
+
+    const btn = document.createElement('button');
+    btn.textContent = 'OK';
+    btn.type = 'button';
+    btn.style.marginLeft = '5px';
+    btn.onclick = () => {
+        try {
+            const seleccion = select.value;
+            if (seleccion === 'A') {
+                limpiarMatriz('matrizA');
+            } else if (seleccion === 'B') {
+                limpiarMatriz('matrizB');
+            } else {
+                limpiarMatriz('matrizA');
+                limpiarMatriz('matrizB');
+            }
+            document.getElementById('matrizA').style.display = '';
+            document.getElementById('matrizB').style.display = '';
+            limpiarResultado();
+        } catch (error) {
+            alert('Error al limpiar las matrices: ' + error.message);
+        }
+        form.remove();
+    };
+
+    const btnCancel = document.createElement('button');
+    btnCancel.textContent = 'Cancelar';
+    btnCancel.type = 'button';
+    btnCancel.style.marginLeft = '5px';
+    btnCancel.onclick = () => form.remove();
+
+    form.appendChild(label);
+    form.appendChild(select);
+    form.appendChild(btn);
+    form.appendChild(btnCancel);
+    acciones.appendChild(form);
 });
 
 // Limpia todos los inputs de una matriz específica.
@@ -182,9 +292,15 @@ function limpiarResultado() {
     if (div) div.innerHTML = '<h2>Resultado</h2>';
 }
 
+// Variables para recordar la última operación y sus parámetros
+let ultimaOperacion = null;
+let ultimaParametros = null;
+
 // Suma de matrices (A + B)
 function sumarMatrices() {
     try {
+        ultimaOperacion = 'sumar';
+        ultimaParametros = null;
         const n = nGlobal;
         if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
             mostrarResultado('Suma', '<div class="error">Debe ingresar ambas matrices completas y del mismo tamaño.</div>');
@@ -210,6 +326,8 @@ function sumarMatrices() {
 // Resta de matrices (A - B y B - A)
 function restarMatrices() {
     try {
+        ultimaOperacion = 'restar';
+        ultimaParametros = null;
         const n = nGlobal;
         if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
             mostrarResultado('Resta', '<div class="error">Debe ingresar ambas matrices completas y del mismo tamaño.</div>');
@@ -239,6 +357,8 @@ function restarMatrices() {
 // Multiplicación de matrices (A × B)
 function multiplicarMatrices() {
     try {
+        ultimaOperacion = 'multiplicar';
+        ultimaParametros = null;
         const n = nGlobal;
         if (!matricesCompletas(['matrizA', 'matrizB'], n)) {
             mostrarResultado('Multiplicación', '<div class="error">Debe ingresar ambas matrices completas.</div>');
@@ -312,12 +432,13 @@ function multiplicarPorEscalar() {
     try {
         const k = parseFloat(document.getElementById('escalarInput').value);
         const matriz = document.getElementById('escalarMatrizSelect').value;
-        const n = nGlobal;
-        if (isNaN(k) || !matricesCompletas([`matriz${matriz}`], n)) {
+        ultimaOperacion = 'escalar';
+        ultimaParametros = { k, matriz };
+        if (isNaN(k) || !matricesCompletas([`matriz${matriz}`], nGlobal)) {
             mostrarResultado('Multiplicación por escalar', '<div class="error">Ingrese un escalar y matriz válidos.</div>');
             return;
         }
-        const matrizData = obtenerMatriz(`matriz${matriz}`, n);
+        const matrizData = obtenerMatriz(`matriz${matriz}`, nGlobal);
         if (!matrizData) {
             mostrarResultado('Multiplicación por escalar', `<div class="error">Todas las celdas de la matriz ${matriz} deben estar completas y ser números.</div>`);
             return;
@@ -367,6 +488,8 @@ function mostrarTransponerUI() {
 function transponerMatriz() {
     try {
         const matriz = document.getElementById('transponerMatrizSelect').value;
+        ultimaOperacion = 'transponer';
+        ultimaParametros = { matriz };
         const n = nGlobal;
         if (!matricesCompletas([`matriz${matriz}`], n)) {
             mostrarResultado('Transpuesta', `<div class="error">Debe ingresar la matriz ${matriz}.</div>`);
@@ -433,6 +556,8 @@ function mostrarDeterminanteUI() {
 function calcularDeterminante() {
     try {
         const matriz = document.getElementById('determinanteMatrizSelect').value;
+        ultimaOperacion = 'determinante';
+        ultimaParametros = { matriz };
         const n = nGlobal;
         if (!matricesCompletas([`matriz${matriz}`], n)) {
             mostrarResultado('Determinante', `<div class="error">Debe ingresar la matriz ${matriz}.</div>`);
@@ -488,6 +613,8 @@ function mostrarInversaUI() {
 function calcularInversa() {
     try {
         const matriz = document.getElementById('inversaMatrizSelect').value;
+        ultimaOperacion = 'inversa';
+        ultimaParametros = { matriz };
         const n = nGlobal;
         if (!matricesCompletas([`matriz${matriz}`], n)) {
             mostrarResultado('Inversa', `<div class="error">Debe ingresar la matriz ${matriz}.</div>`);
@@ -567,6 +694,8 @@ function generarIdentidad() {
         const input = document.getElementById('identidadSizeInput');
         if (!input) return;
         const n = parseInt(input.value, 10);
+        ultimaOperacion = 'identidad';
+        ultimaParametros = { n };
         if (isNaN(n) || n < 2 || n > 10) {
             mostrarResultado('Identidad', '<div class="error">Ingrese un tamaño válido entre 2 y 10.</div>');
             return;
@@ -581,6 +710,136 @@ function generarIdentidad() {
         mostrarResultado('Identidad', tablaHTML(identidad));
     } catch (error) {
         mostrarResultado('Identidad', `<div class="error">Error al generar la matriz identidad: ${error.message}</div>`);
+    }
+}
+
+// Función para volver a ejecutar la última operación
+function repetirUltimaOperacion() {
+    if (!ultimaOperacion) return;
+    switch (ultimaOperacion) {
+        case 'sumar':
+            sumarMatrices();
+            break;
+        case 'restar':
+            restarMatrices();
+            break;
+        case 'multiplicar':
+            multiplicarMatrices();
+            break;
+        case 'escalar':
+            if (ultimaParametros && typeof ultimaParametros.k !== 'undefined' && ultimaParametros.matriz) {
+                // Restaurar valores en el formulario si existe
+                const k = ultimaParametros.k;
+                const matriz = ultimaParametros.matriz;
+                // Solo recalcula si el formulario sigue visible, si no, ejecuta con los últimos parámetros
+                if (matricesCompletas([`matriz${matriz}`], nGlobal)) {
+                    const matrizData = obtenerMatriz(`matriz${matriz}`, nGlobal);
+                    if (matrizData) {
+                        const resultado = matrizData.map(fila => fila.map(v => k * v));
+                        mostrarResultado('Multiplicación por escalar', tablaHTML(resultado));
+                    }
+                }
+            }
+            break;
+        case 'transponer':
+            if (ultimaParametros && ultimaParametros.matriz) {
+                const matriz = ultimaParametros.matriz;
+                if (matricesCompletas([`matriz${matriz}`], nGlobal)) {
+                    const matrizData = obtenerMatriz(`matriz${matriz}`, nGlobal);
+                    if (matrizData) {
+                        const transpuesta = matrizData[0].map((_, j) => matrizData.map(fila => fila[j]));
+                        mostrarResultado('Transpuesta', `
+                            <div style="display:flex;gap:40px;align-items:flex-start;">
+                                <div>
+                                    <div style="font-weight:bold;text-align:center;">${matriz === 'A' ? 'Matriz A' : 'Matriz B'}</div>
+                                    ${tablaHTML(matrizData)}
+                                </div>
+                                <div>
+                                    <div style="font-weight:bold;text-align:center;">Transpuesta (${matriz}<sup>T</sup>)</div>
+                                    ${tablaHTML(transpuesta)}
+                                </div>
+                            </div>
+                        `);
+                    }
+                }
+            }
+            break;
+        case 'determinante':
+            if (ultimaParametros && ultimaParametros.matriz) {
+                const matriz = ultimaParametros.matriz;
+                if (matricesCompletas([`matriz${matriz}`], nGlobal)) {
+                    const matrizData = obtenerMatriz(`matriz${matriz}`, nGlobal);
+                    if (matrizData) {
+                        const det = determinanteGauss(matrizData);
+                        mostrarResultado('Determinante', `<div>Determinante(${matriz}): <b>${det}</b></div>`);
+                    }
+                }
+            }
+            break;
+        case 'inversa':
+            if (ultimaParametros && ultimaParametros.matriz) {
+                const matriz = ultimaParametros.matriz;
+                if (matricesCompletas([`matriz${matriz}`], nGlobal)) {
+                    const matrizData = obtenerMatriz(`matriz${matriz}`, nGlobal);
+                    if (matrizData) {
+                        const det = determinanteGauss(matrizData);
+                        if (Math.abs(det) < 1e-10) {
+                            mostrarResultado('Inversa', `<div class="error">La matriz no es invertible (determinante = 0).</div>`);
+                            return;
+                        }
+                        const inversa = inversaGaussJordan(matrizData);
+                        if (!inversa) {
+                            mostrarResultado('Inversa', `<div class="error">La matriz no es invertible (singular o mal condicionada).</div>`);
+                            return;
+                        }
+                        const producto = multiplicarMatricesGenerico(matrizData, inversa);
+                        mostrarResultado('Inversa', `
+                            <div style="display:flex;gap:40px;align-items:flex-start;">
+                                <div>
+                                    <div style="font-weight:bold;text-align:center;">${matriz === 'A' ? 'Matriz A' : 'Matriz B'}</div>
+                                    ${tablaHTML(matrizData)}
+                                </div>
+                                <div>
+                                    <div style="font-weight:bold;text-align:center;">Inversa (${matriz}<sup>-1</sup>)</div>
+                                    ${tablaHTML(inversa)}
+                                </div>
+                                <div>
+                                    <div style="font-weight:bold;text-align:center;">Verificación: ${matriz} × ${matriz}<sup>-1</sup> = I</div>
+                                    ${tablaHTML(producto)}
+                                </div>
+                            </div>
+                        `);
+                    }
+                }
+            }
+            break;
+        case 'identidad':
+            if (ultimaParametros && typeof ultimaParametros.n === 'number') {
+                const n = ultimaParametros.n;
+                const identidad = [];
+                for (let i = 0; i < n; i++) {
+                    identidad[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        identidad[i][j] = (i === j ? 1 : 0);
+                    }
+                }
+                mostrarResultado('Identidad', tablaHTML(identidad));
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+// Añadir event listener a los inputs de ambas matrices para actualizar el resultado automáticamente
+function agregarListenersInputsMatriz(idMatriz, n) {
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            const input = document.getElementById(`${idMatriz}_${i}_${j}`);
+            if (input) {
+                input.oninput = repetirUltimaOperacion;
+            }
+        }
     }
 }
 
